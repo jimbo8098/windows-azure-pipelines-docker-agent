@@ -9,7 +9,7 @@ Edit the following command then run it with the `<placeholders>` filled in as be
 | org       | The organisation name from Azure. When you sign into Azure DevOps, the organisations are on the left menu (or in the hamburger menu at the top left if you are using a mobile for some reason)                                                                                          |
 | PAT       | Your PAT token for Azure DevOps. You can find out how to make one by following the Authenticate with a personal access token (PAT) section of https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-windows?view=azure-devops#authenticate-with-a-personal-access-token-pat |
 | Pool Name | The name of the pool as seen in Project > Project Settings > Agent Pools. This may include spaces.                                                                                                                                                                                      |
-
+| Replicas  | The number of replicas to start the service with. You can always scale this later.                                                                                                                                                                                                      |
 
 ```
 docker service create \
