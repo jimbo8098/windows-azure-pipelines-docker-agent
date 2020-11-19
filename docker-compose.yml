@@ -1,0 +1,21 @@
+---
+version: '3.4'
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - AZP_POOL=
+      - AZP_TOKEN
+      - AZP_URL=
+    volumes:
+      - type: npipe
+        source: \\.\pipe\docker_engine\
+        target: \\.\pipe\docker_engine\
+      - type: bind
+        source: C:\Program Files\Docker
+        target: C:\Program Files\Docker
+    deploy:
+      mode: replicated
+      replicas: 2

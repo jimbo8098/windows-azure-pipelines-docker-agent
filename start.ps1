@@ -19,7 +19,7 @@ if ($Env:AZP_WORK -and -not (Test-Path Env:AZP_WORK)) {
   New-Item $Env:AZP_WORK -ItemType directory | Out-Null
 }
 
-New-Item "\azp\agent" -ItemType directory | Out-Null
+New-Item "C:\azp\agent" -ItemType directory | Out-Null
 
 # Let the agent ignore the token env variables
 $Env:VSO_AGENT_IGNORE = "AZP_TOKEN,AZP_TOKEN_FILE"
@@ -29,10 +29,10 @@ Set-Location agent
 Write-Host "1. Determining matching Azure Pipelines agent..." -ForegroundColor Cyan
 
 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$(Get-Content ${Env:AZP_TOKEN_FILE})"))
-$package = Invoke-RestMethod -Headers @{Authorization=("Basic $base64AuthInfo")} "$(${Env:AZP_URL})/_apis/distributedtask/packages/agent?platform=win-x64&`$top=1"
+$address = "${Env:AZP_URL}/_apis/distributedtask/packages/agent?platform=win-x64&`$top=1"
+Write-Host "Downloading Azure Agent from: ${address}"
+$package = Invoke-WebRequest -Headers @{Authorization=("Basic $base64AuthInfo")} -Uri $address
 $packageUrl = $package[0].Value.downloadUrl
-
-Write-Host $packageUrl
 
 Write-Host "2. Downloading and installing Azure Pipelines agent..." -ForegroundColor Cyan
 
