@@ -30,12 +30,25 @@ Write-Host "1. Determining matching Azure Pipelines agent..." -ForegroundColor C
 
 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$(Get-Content ${Env:AZP_TOKEN_FILE})"))
 $address = "${Env:AZP_URL}/_apis/distributedtask/packages/agent?platform=win-x64&`$top=1"
-Write-Host "Downloading Azure Agent from: ${address}"
-$package = Invoke-WebRequest -Headers @{Authorization=("Basic $base64AuthInfo")} -Uri $address
-$packageUrl = $package[0].Value.downloadUrl
+try
+{
+	$package = Invoke-RestMethod -Headers @{Authorization=("Basic $base64AuthInfo")} -Uri $address -UseBasicParsing
+}
+catch
+{
+	Write-Error "Status Code: ${_.Exception.Response.StatusCode.value__}"
+	Write-Error "Failed to get the agent binary list. Does your token have the correct permissions?"
+	Exit 1
+}
+$packageUrl = $package.value[0].downloadUrl
 
+if($package.value[0].downloadUrl -eq $null)
+{
+	Write-Error "Failed to find the download URL."
+}
 Write-Host "2. Downloading and installing Azure Pipelines agent..." -ForegroundColor Cyan
 
+echo "Downloading Azure Agent from: : ${$packageUrl}"
 $wc = New-Object System.Net.WebClient
 $wc.DownloadFile($packageUrl, "$(Get-Location)\agent.zip")
 
